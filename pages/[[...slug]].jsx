@@ -1,7 +1,13 @@
 import Head from "next/head";
 import Image from "next/image";
 
-const slugs = ["/", "/foo", "/foo/bar"];
+import siteSettingsQuery from "../graphql/queries/contentful/siteSettingsQuery";
+import pageQuery from "../graphql/queries/contentful/pageQuery";
+import pagesQuery from "../graphql/queries/contentful/pagesQuery";
+import productsQuery from "../graphql/queries/shopify/productsQuery";
+
+import queryContentful from "../graphql/helpers/queryContentful";
+import queryShopify from "../graphql/helpers/queryShopify";
 
 const Page = () => {
   return (
@@ -31,11 +37,14 @@ const slugToArray = (slug) => {
 };
 
 export const getStaticPaths = async () => {
-  const paths = slugs?.map((slug) => {
-    const slugArray = slugToArray(slug);
+  const allPagesDataReq = await queryContentful(pagesQuery, { type: "page" });
+  const allPages = allPagesDataReq.data?.pageCollection?.items || [];
+
+  const paths = allPages?.map((page) => {
+    const slug = slugToArray(page.slug);
     return {
       params: {
-        slug: slugArray,
+        slug,
       },
     };
   });
@@ -51,7 +60,22 @@ export const getStaticProps = async (context) => {
   const { slug: slugArray } = context.params;
   const slug = slugArray ? `/${slugArray?.join("/")}` : "/";
 
-  const notFound = !slugs.includes(slug);
+  const pageDataReq = await queryContentful(pageQuery, { slug, preview });
+  const pageData = pageDataReq.data?.pageCollection?.items[0];
+  const sections = pageData?.sectionsCollection?.items.filter(
+    (item) => item !== null
+  );
+
+  console.log("pageDataReq", pageDataReq);
+  console.log("pageData", pageData);
+
+  const siteSettingsDataReq = await queryContentful(siteSettingsQuery, {
+    preview,
+  });
+  const siteSettingsData =
+    siteSettingsDataReq.data?.siteSettingsCollection?.items[0];
+
+  const notFound = pageData ? false : true;
 
   const props = {
     slug,
