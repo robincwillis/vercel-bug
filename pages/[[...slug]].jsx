@@ -4,10 +4,8 @@ import Image from "next/image";
 import siteSettingsQuery from "../graphql/queries/contentful/siteSettingsQuery";
 import pageQuery from "../graphql/queries/contentful/pageQuery";
 import pagesQuery from "../graphql/queries/contentful/pagesQuery";
-import productsQuery from "../graphql/queries/shopify/productsQuery";
 
 import queryContentful from "../graphql/helpers/queryContentful";
-import queryShopify from "../graphql/helpers/queryShopify";
 
 const Page = () => {
   return (
