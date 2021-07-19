@@ -1,4 +1,5 @@
 import { GraphQLClient } from "graphql-request";
+import compress from "graphql-query-compress";
 
 async function queryContentful(query, variables) {
 	const endpoint = `https://graphql.contentful.com/content/v1/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}`;
@@ -13,7 +14,7 @@ async function queryContentful(query, variables) {
 			},
 		});
 
-		const result = await graphQLClient.request(query, variables);
+		const result = await graphQLClient.request(compress(query), variables);
 		return { data: result };
 	} catch (err) {
 		if (err.response) {
